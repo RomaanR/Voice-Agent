@@ -3,407 +3,547 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CleanPark Alex Voice Agent</title>
+    <title>Voice Agent Demo</title>
+    <link rel="icon" href="data:," />
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
       :root {
         color-scheme: dark;
-        --lime: #b8ff05;
-        --lime-soft: rgba(184, 255, 5, 0.16);
-        --white: #f8faf5;
-        --muted: #cfd8ce;
-        --panel: rgba(7, 10, 9, 0.7);
-        --line: rgba(255, 255, 255, 0.16);
-        --ink: #071008;
+        --bg: #0b0b0f;
+        --panel: #1a1a24;
+        --panel-soft: rgba(26, 26, 36, 0.72);
+        --surface: rgba(255, 255, 255, 0.045);
+        --line: rgba(215, 225, 238, 0.14);
+        --line-strong: rgba(191, 217, 255, 0.34);
+        --text: #f7f8fb;
+        --muted: rgba(247, 248, 251, 0.68);
+        --faint: rgba(247, 248, 251, 0.46);
+        --accent: #bfd9ff;
+        --accent-strong: #e5f0ff;
+        --ready: #76d89a;
+        --danger: #f18a8a;
+        --shadow: rgba(0, 0, 0, 0.52);
       }
 
       * {
         box-sizing: border-box;
       }
 
+      html {
+        min-height: 100%;
+        background: var(--bg);
+      }
+
       body {
         margin: 0;
         min-height: 100vh;
         overflow-x: hidden;
-        font-family: "Manrope", Arial, Helvetica, sans-serif;
-        color: var(--white);
+        font-family:
+          "Inter",
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        color: var(--text);
         background:
-          linear-gradient(90deg, rgba(3, 7, 6, 0.9) 0%, rgba(3, 7, 6, 0.64) 45%, rgba(3, 7, 6, 0.48) 100%),
-          linear-gradient(180deg, rgba(3, 7, 6, 0.28) 0%, rgba(3, 7, 6, 0.86) 100%),
-          url("assets/background.webp");
-        background-position: center center;
-        background-size: cover;
+          radial-gradient(circle at 78% 22%, rgba(191, 217, 255, 0.11), transparent 30rem),
+          radial-gradient(circle at 14% 78%, rgba(255, 255, 255, 0.055), transparent 26rem),
+          linear-gradient(145deg, #0b0b0f 0%, #101018 48%, #08080b 100%);
       }
 
-      body::before {
+      body::before,
+      body::after {
         content: "";
         position: fixed;
         inset: 0;
         pointer-events: none;
+      }
+
+      body::before {
+        opacity: 0.2;
+        background-image:
+          linear-gradient(rgba(191, 217, 255, 0.13) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(191, 217, 255, 0.11) 1px, transparent 1px);
+        background-size: 68px 68px;
+        mask-image: radial-gradient(circle at 58% 42%, black 0%, transparent 70%);
+      }
+
+      body::after {
         background:
-          radial-gradient(circle at 50% 0%, rgba(184, 255, 5, 0.26), transparent 32%),
-          linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.1) 44%, transparent 52%);
-        mix-blend-mode: screen;
+          linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.045) 48%, transparent 55%),
+          radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.4) 74%);
+        opacity: 0.72;
+      }
+
+      button {
+        font: inherit;
       }
 
       .page {
         position: relative;
+        z-index: 1;
         width: 100%;
         min-height: 100vh;
-        display: grid;
-        place-items: center;
-        padding: 36px 18px;
+        display: flex;
+        justify-content: center;
+        padding: 44px 28px;
       }
 
       .shell {
-        width: 100%;
-        max-width: 960px;
+        width: min(100%, 1180px);
+        min-height: calc(100vh - 88px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 48px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: clamp(32px, 5vw, 72px);
+        align-items: center;
+      }
+
+      .context {
         min-width: 0;
         display: grid;
-        justify-items: center;
-        text-align: center;
-      }
-
-      .brand {
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 18px 12px 12px;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        background: rgba(3, 7, 6, 0.44);
-        backdrop-filter: blur(18px);
-      }
-
-      .brand-mark {
-        width: 54px;
-        height: 54px;
-        border-radius: 999px;
-        display: grid;
-        place-items: center;
-        background: var(--lime);
-        color: var(--ink);
-        font-weight: 800;
-        letter-spacing: 0;
-      }
-
-      .brand-copy {
-        display: grid;
-        gap: 1px;
-        text-align: left;
-      }
-
-      .brand-title {
-        font-size: 19px;
-        font-weight: 800;
-      }
-
-      .brand-subtitle {
-        color: var(--muted);
-        font-size: 15px;
-        font-weight: 600;
+        gap: 38px;
       }
 
       .eyebrow {
-        margin: 28px 0 14px;
-        padding: 9px 14px;
-        border: 1px solid rgba(184, 255, 5, 0.36);
-        border-radius: 999px;
-        background: var(--lime-soft);
-        color: var(--lime);
-        font-size: 13px;
+        margin: 0 0 14px;
+        color: var(--accent);
+        font-size: 12px;
         font-weight: 800;
-        letter-spacing: 0.14em;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
       }
 
-      h1 {
+      h1,
+      h2,
+      h3,
+      p {
         margin: 0;
-        width: 100%;
-        max-width: 920px;
-        font-size: clamp(46px, 6.5vw, 82px);
+      }
+
+      .scenario h1 {
+        max-width: 620px;
+        font-size: clamp(44px, 5vw, 72px);
         line-height: 0.96;
-        letter-spacing: 0;
+        font-weight: 800;
       }
 
-      .intro {
-        max-width: 720px;
-        margin: 18px auto 0;
+      .scenario-copy {
+        max-width: 600px;
+        margin-top: 24px;
         color: var(--muted);
-        font-size: clamp(18px, 1.8vw, 22px);
-        line-height: 1.55;
-        font-weight: 600;
+        font-size: clamp(17px, 1.5vw, 20px);
+        line-height: 1.7;
+        font-weight: 400;
       }
 
-      .call-card {
-        width: 100%;
-        max-width: 640px;
-        min-width: 0;
-        margin-top: 34px;
+      .architecture {
+        display: grid;
+        gap: 18px;
+      }
+
+      .section-title {
+        color: var(--text);
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .architecture-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .architecture-item {
+        min-height: 116px;
         padding: 18px;
         border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.025)),
+          rgba(255, 255, 255, 0.02);
+      }
+
+      .architecture-label {
+        display: block;
+        color: var(--accent-strong);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .architecture-value {
+        display: block;
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+        font-weight: 500;
+      }
+
+      .demo-wrap {
+        min-width: 0;
+      }
+
+      .demo-card {
+        width: 100%;
+        max-width: 520px;
+        margin-left: auto;
+        padding: clamp(26px, 3vw, 36px);
+        border: 1px solid var(--line-strong);
         border-radius: 18px;
-        background: var(--panel);
-        backdrop-filter: blur(22px);
-        box-shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
+        background:
+          linear-gradient(160deg, rgba(255, 255, 255, 0.055), transparent 38%),
+          var(--panel);
+        box-shadow:
+          0 34px 90px var(--shadow),
+          0 0 0 1px rgba(255, 255, 255, 0.045) inset,
+          0 0 58px rgba(191, 217, 255, 0.08);
+      }
+
+      .card-kicker {
+        color: var(--faint);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .demo-card h2 {
+        margin-top: 12px;
+        font-size: clamp(34px, 4vw, 48px);
+        line-height: 1;
+        font-weight: 800;
+      }
+
+      .call-panel {
+        margin-top: 30px;
       }
 
       .call-button {
+        position: relative;
         width: 100%;
-        min-height: 82px;
-        border: 0;
-        border-radius: 14px;
+        min-height: 72px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 14px;
+        gap: 12px;
         cursor: pointer;
-        background: linear-gradient(135deg, var(--lime), #efffd3);
-        color: var(--ink);
-        font-family: inherit;
-        font-size: clamp(22px, 2.4vw, 28px);
+        overflow: hidden;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(191, 217, 255, 0.92)),
+          var(--accent);
+        color: #090b10;
+        font-size: 17px;
         font-weight: 800;
-        letter-spacing: 0;
-        box-shadow: 0 18px 46px rgba(184, 255, 5, 0.28);
+        box-shadow:
+          0 18px 46px rgba(191, 217, 255, 0.18),
+          0 0 0 1px rgba(255, 255, 255, 0.24) inset;
         transition:
           transform 180ms ease,
           box-shadow 180ms ease,
-          background 180ms ease;
+          opacity 180ms ease;
+      }
+
+      .call-button::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.52) 48%, transparent 56%);
+        opacity: 0;
+        transform: translateX(-55%);
+        transition:
+          opacity 180ms ease,
+          transform 420ms ease;
       }
 
       .call-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 24px 60px rgba(184, 255, 5, 0.36);
+        box-shadow:
+          0 24px 58px rgba(191, 217, 255, 0.24),
+          0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+      }
+
+      .call-button:hover::after {
+        opacity: 0.65;
+        transform: translateX(55%);
       }
 
       .call-button:disabled {
         cursor: wait;
-        opacity: 0.78;
+        opacity: 0.72;
         transform: none;
       }
 
       .call-button.is-live {
-        background: linear-gradient(135deg, #ff6565, #ffd2b8);
-        box-shadow: 0 18px 46px rgba(255, 101, 101, 0.34);
+        background:
+          linear-gradient(135deg, rgba(26, 26, 36, 0.96), rgba(41, 45, 55, 0.96)),
+          var(--panel);
+        color: var(--text);
+        box-shadow:
+          0 18px 46px rgba(0, 0, 0, 0.28),
+          0 0 0 1px rgba(118, 216, 154, 0.24) inset;
       }
 
-      .button-icon {
-        width: 42px;
-        height: 42px;
-        border-radius: 999px;
-        display: grid;
-        place-items: center;
-        background: rgba(7, 16, 8, 0.14);
-      }
-
-      .button-icon svg {
-        width: 21px;
-        height: 21px;
-        stroke: currentColor;
-        stroke-width: 2.4;
-        fill: none;
-      }
-
-      .status {
-        width: 100%;
-        min-width: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 15px;
-        color: var(--muted);
-        font-size: 15px;
-        line-height: 1.45;
-        font-weight: 600;
-      }
-
-      #statusText {
-        min-width: 0;
-        overflow-wrap: anywhere;
-      }
-
-      .dot {
+      .button-dot {
         width: 11px;
         height: 11px;
         flex: 0 0 auto;
         border-radius: 999px;
-        background: var(--lime);
-        box-shadow: 0 0 18px rgba(184, 255, 5, 0.7);
+        background: var(--ready);
+        box-shadow: 0 0 0 0 rgba(118, 216, 154, 0.5);
+        animation: pulse 1.8s ease-out infinite;
       }
 
-      .dot.is-live {
-        background: #ff6565;
-        box-shadow: 0 0 18px rgba(255, 101, 101, 0.7);
+      .button-dot.is-live {
+        background: var(--ready);
       }
 
-      .features {
-        width: 100%;
-        max-width: 880px;
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
-        margin-top: 28px;
-      }
-
-      .feature {
-        min-height: 66px;
-        display: grid;
-        place-items: center;
-        padding: 13px 12px;
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        background: rgba(3, 7, 6, 0.42);
-        color: var(--muted);
-        font-size: 15px;
-        font-weight: 800;
-        line-height: 1.25;
-      }
-
-      @media (max-width: 700px) {
-        body {
-          background-position: 43% center;
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(118, 216, 154, 0.48);
         }
 
+        70% {
+          box-shadow: 0 0 0 12px rgba(118, 216, 154, 0);
+        }
+
+        100% {
+          box-shadow: 0 0 0 0 rgba(118, 216, 154, 0);
+        }
+      }
+
+      .status {
+        margin-top: 14px;
+        color: var(--faint);
+        font-size: 14px;
+        line-height: 1.5;
+        font-weight: 500;
+      }
+
+      .cheat-sheet {
+        margin-top: 30px;
+        padding-top: 26px;
+        border-top: 1px solid var(--line);
+      }
+
+      .cheat-sheet h3 {
+        color: var(--text);
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .prompt-list {
+        display: grid;
+        gap: 10px;
+        margin: 16px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .prompt-list li {
+        display: grid;
+        grid-template-columns: 82px minmax(0, 1fr);
+        gap: 12px;
+        padding: 13px 0;
+        border-bottom: 1px solid rgba(215, 225, 238, 0.08);
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.48;
+      }
+
+      .prompt-list li:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .prompt-type {
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 900px) {
+        .architecture-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 767px) {
         .page {
-          place-items: center;
-          padding: 24px 16px;
+          min-height: 100vh;
+          padding: 24px 16px 36px;
         }
 
         .shell {
-          max-width: 280px;
+          min-height: auto;
+          justify-content: flex-start;
+          gap: 28px;
         }
 
-        .brand {
+        .layout {
+          grid-template-columns: 1fr;
+          gap: 34px;
+        }
+
+        .context {
+          order: 2;
+          gap: 32px;
+        }
+
+        .demo-wrap {
+          order: 1;
+        }
+
+        .demo-card {
+          max-width: none;
+          margin: 0;
+          padding: 24px 18px;
           border-radius: 16px;
-          padding: 10px 14px 10px 10px;
         }
 
-        .brand-mark {
-          width: 42px;
-          height: 42px;
+        .demo-card h2 {
+          font-size: 36px;
         }
 
-        .brand-title {
-          font-size: 15px;
-        }
-
-        .brand-subtitle {
-          font-size: 12px;
-        }
-
-        .eyebrow {
+        .call-panel {
           margin-top: 24px;
-          padding: 8px 12px;
-          font-size: 12px;
         }
 
-        h1 {
-          font-size: 32px;
+        .call-button {
+          min-height: 66px;
+          border-radius: 11px;
+          font-size: 16px;
         }
 
-        .intro {
+        .scenario h1 {
+          font-size: 42px;
+        }
+
+        .scenario-copy {
           margin-top: 18px;
           font-size: 16px;
         }
 
-        .call-card {
-          max-width: 280px;
-          margin-top: 28px;
-          padding: 12px;
-          border-radius: 16px;
+        .architecture-grid {
+          grid-template-columns: 1fr;
         }
 
-        .call-button {
-          min-height: 70px;
-          border-radius: 12px;
-          gap: 10px;
-          font-size: 18px;
+        .architecture-item {
+          min-height: auto;
         }
 
-        .button-icon {
-          width: 40px;
-          height: 40px;
+        .prompt-list li {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .page {
+          padding-inline: 12px;
         }
 
-        .button-icon svg {
-          width: 20px;
-          height: 20px;
+        .demo-card {
+          padding-inline: 16px;
         }
 
-        .status {
-          align-items: flex-start;
-          text-align: left;
-          justify-content: flex-start;
-          padding: 0 4px;
-          margin-top: 15px;
-          font-size: 14px;
-        }
-
-        .dot {
-          width: 10px;
-          height: 10px;
-        }
-
-        .features {
-          max-width: 280px;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 8px;
-          margin-top: 22px;
-        }
-
-        .feature {
-          min-height: 54px;
-          padding: 10px 8px;
-          font-size: 12px;
+        .demo-card h2,
+        .scenario h1 {
+          font-size: 32px;
         }
       }
     </style>
   </head>
   <body>
     <main class="page">
-      <section class="shell" aria-label="CleanPark Alex demo">
-        <div class="brand">
-          <div class="brand-mark">KP</div>
-          <div class="brand-copy">
-            <div class="brand-title">CleanPark</div>
-            <div class="brand-subtitle">Live Voice Agent Demo</div>
-          </div>
-        </div>
+      <section class="shell" aria-label="Live AI voice agent demo">
+        <div class="layout">
+          <section class="context" aria-label="Demo context and architecture">
+            <div class="scenario">
+              <p class="eyebrow">The Scenario</p>
+              <h1>Enterprise voice infrastructure for real customer calls.</h1>
+              <p class="scenario-copy">
+                You are calling CleanPark, a premium auto detailing center. This agent is connected to a live database
+                and calendar. Test its ability to handle complex service inquiries, manage objections, and book
+                real-time appointments.
+              </p>
+            </div>
 
-        <div class="eyebrow">Working Agent</div>
-        <h1>Speak with Alex</h1>
-        <p class="intro">
-          A premium voice assistant connected to operational workflows, CRM
-          records, and automation tools for CleanPark customer calls.
-        </p>
+            <div class="architecture">
+              <h2 class="section-title">Under the Hood</h2>
+              <div class="architecture-grid">
+                <div class="architecture-item">
+                  <span class="architecture-label">Voice Engine</span>
+                  <span class="architecture-value">Vapi &amp; ElevenLabs Turbo v2.5 (Sub-800ms latency)</span>
+                </div>
+                <div class="architecture-item">
+                  <span class="architecture-label">Orchestration</span>
+                  <span class="architecture-value">n8n Webhooks for live data retrieval</span>
+                </div>
+                <div class="architecture-item">
+                  <span class="architecture-label">Database</span>
+                  <span class="architecture-value">Supabase (PostgreSQL) for service matrices</span>
+                </div>
+                <div class="architecture-item">
+                  <span class="architecture-label">Guardrails</span>
+                  <span class="architecture-value">Strict system prompting to prevent hallucinated pricing</span>
+                </div>
+              </div>
+            </div>
+          </section>
 
-        <div class="call-card">
-          <button class="call-button" id="callButton" type="button">
-            <span class="button-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3.08 5.18 2 2 0 0 1 5.06 3h3a2 2 0 0 1 2 1.72c.12.92.32 1.82.6 2.68a2 2 0 0 1-.45 2.11L8.9 10.82a16 16 0 0 0 4.28 4.28l1.31-1.31a2 2 0 0 1 2.11-.45c.86.28 1.76.48 2.68.6A2 2 0 0 1 22 16.92Z" />
-              </svg>
-            </span>
-            <span id="buttonLabel">Start Demo Call</span>
-          </button>
+          <section class="demo-wrap" aria-label="Interactive demo">
+            <div class="demo-card">
+              <div class="card-kicker">CleanPark Agent</div>
+              <h2>Speak with Alex</h2>
 
-          <div class="status">
-            <span class="dot" id="statusDot" aria-hidden="true"></span>
-            <span id="statusText">Ready. Click the button and allow microphone access.</span>
-          </div>
-        </div>
+              <div class="call-panel">
+                <button class="call-button" id="callButton" type="button">
+                  <span class="button-dot" id="statusDot" aria-hidden="true"></span>
+                  <span id="buttonLabel">Start Demo Call</span>
+                </button>
+                <p class="status" id="statusText">Ready. Click the button and allow microphone access.</p>
+              </div>
 
-        <div class="features" aria-label="Agent capabilities and metrics">
-          <div class="feature">Real-Time Voice AI</div>
-          <div class="feature">Advanced Intent Resolution</div>
-          <div class="feature">Enterprise Automation Backend</div>
-          <div class="feature">Cloud Productivity Sync</div>
-          <div class="feature">24/7 Coverage</div>
-          <div class="feature">Concurrent Calls</div>
-          <div class="feature">&lt;120s Execution</div>
-          <div class="feature">&lt;5s Confirmation Dispatch</div>
+              <div class="cheat-sheet">
+                <h3>Try asking Alex:</h3>
+                <ul class="prompt-list">
+                  <li>
+                    <span class="prompt-type">Basic</span>
+                    <span>What is the difference between an Interior Detail and a Super Detail?</span>
+                  </li>
+                  <li>
+                    <span class="prompt-type">Interrupt</span>
+                    <span>Can I book an exterior detail for tomorrow? Actually, wait, do you guys do ceramic coating?</span>
+                  </li>
+                  <li>
+                    <span class="prompt-type">Guardrail</span>
+                    <span>I have a scratch on my bumper, how much to fix it?</span>
+                  </li>
+                  <li>
+                    <span class="prompt-type">Booking</span>
+                    <span>I want to book an X'Press Detail for next Tuesday morning.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
         </div>
       </section>
     </main>
